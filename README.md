@@ -14,13 +14,15 @@ MCP server for [Spaceship AI](https://spaceshipai.io) — build, run, and manage
 
 ## Quick start
 
-The fastest way to install is with the Spaceship CLI. It detects every AI IDE you have installed and configures them automatically:
+Don't want to manually configure your MCP server?
+
+Run `spaceshipai@latest init` to set everything up automatically with one command:
 
 ```bash
 npx spaceshipai@latest init
 ```
 
-Your browser opens to sign in and authorize — no API key copying required.
+This works with Claude Code, Cursor, VS Code, and Windsurf. It will authenticate via your browser, create a Spaceship API key for you, and configure your editor automatically.
 
 ## Manual installation
 
