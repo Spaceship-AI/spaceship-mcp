@@ -1,93 +1,167 @@
 ```ansi
-       ███████╗██████╗  █████╗  ██████╗███████╗███████╗██╗  ██╗██╗██████╗
-       ██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝██║  ██║██║██╔══██╗
-       ███████╗██████╔╝███████║██║     █████╗  ███████╗███████║██║██████╔╝
-       ╚════██║██╔═══╝ ██╔══██║██║     ██╔══╝  ╚════██║██╔══██║██║██╔═══╝
-       ███████║██║     ██║  ██║╚██████╗███████╗███████║██║  ██║██║██║
-       ╚══════╝╚═╝     ╚═╝  ╚═╝ ╚═════╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝
+       ███████╗██████╗  █████╗  ██████╗███████╗███████╗██╗  ██╗██╗██████╗    █████╗ ██╗
+       ██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝██║  ██║██║██╔══██╗  ██╔══██╗██║
+       ███████╗██████╔╝███████║██║     █████╗  ███████╗███████║██║██████╔╝  ███████║██║
+       ╚════██║██╔═══╝ ██╔══██║██║     ██╔══╝  ╚════██║██╔══██║██║██╔═══╝   ██╔══██║██║
+       ███████║██║     ██║  ██║╚██████╗███████╗███████║██║  ██║██║██║       ██║  ██║██║
+       ╚══════╝╚═╝     ╚═╝  ╚═╝ ╚═════╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝      ╚═╝  ╚═╝╚═╝
 ```
 
 
-# spaceship-mcp
+# Spaceship AI MCP Server
 
-MCP server for [Spaceship AI](https://spaceshipai.io) — manage agents from Claude Code, Cursor, and any other MCP client.
+MCP server for [Spaceship AI](https://spaceshipai.io) — build, run, and manage AI agents directly from Claude Code, Cursor, VS Code, and Windsurf.
 
 ## Quick start
 
-### Claude Code / Claude Desktop
+The fastest way to install is with the Spaceship CLI. It detects every AI IDE you have installed and configures them automatically:
 
-Add to your `.mcp.json` (project-level) or `claude_desktop_config.json`:
+```bash
+npx spaceshipai@latest init
+```
+
+Your browser opens to sign in and authorize — no API key copying required.
+
+## Manual installation
+
+If you prefer to configure manually, add the following to your IDE's MCP config file.
+
+**Claude Code** — run in your terminal:
+
+```bash
+claude mcp add --scope user --transport stdio spaceship --env SPACESHIP_API_KEY=sk_live_... -- uvx spaceship-mcp
+```
+
+Or add to `~/.claude.json`:
 
 ```json
 {
-  "spaceship": {
-    "command": "uvx",
-    "args": ["spaceship-mcp"],
-    "env": {
-      "SPACESHIP_API_KEY": "sk_live_...",
-      "SPACESHIP_API_URL": "https://spaceshipai.io"
+  "mcpServers": {
+    "spaceship": {
+      "command": "uvx",
+      "args": ["spaceship-mcp"],
+      "env": {
+        "SPACESHIP_API_KEY": "sk_live_..."
+      }
     }
   }
 }
 ```
 
-Get your API key from the Spaceship AI dashboard under **Settings → API Keys**.
-
-### Local development (pointing at localhost)
+**Cursor** — add to `~/.cursor/mcp.json`:
 
 ```json
 {
-  "spaceship": {
-    "command": "uvx",
-    "args": ["spaceship-mcp"],
-    "env": {
-      "SPACESHIP_API_KEY": "sk_live_...",
-      "SPACESHIP_API_URL": "http://localhost:3000"
+  "mcpServers": {
+    "spaceship": {
+      "command": "uvx",
+      "args": ["spaceship-mcp"],
+      "env": {
+        "SPACESHIP_API_KEY": "sk_live_..."
+      }
     }
   }
 }
 ```
 
-## Environment variables
+**VS Code** — add to `~/.vscode/mcp.json`:
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `SPACESHIP_API_KEY` | Yes | — | Your Spaceship API key (`sk_live_...`) |
-| `SPACESHIP_API_URL` | No | `https://spaceshipai.io` | Override for local dev or staging |
+```json
+{
+  "servers": {
+    "spaceship": {
+      "command": "uvx",
+      "args": ["spaceship-mcp"],
+      "env": {
+        "SPACESHIP_API_KEY": "sk_live_..."
+      }
+    }
+  }
+}
+```
+
+**Windsurf** — add to `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "spaceship": {
+      "command": "uvx",
+      "args": ["spaceship-mcp"],
+      "env": {
+        "SPACESHIP_API_KEY": "sk_live_..."
+      }
+    }
+  }
+}
+```
+
+Get your API key from [spaceshipai.io](https://spaceshipai.io) under **Settings → API Keys**.
 
 ## Tools
 
-| Tool | What it does |
+### Projects
+
+| Tool | Description |
 |------|-------------|
-| `list_projects` | List all projects in your org |
+| `list_projects` | List all projects in your organization |
+
+### Agents
+
+| Tool | Description |
+|------|-------------|
 | `list_agents` | List agents, optionally filtered by project |
-| `get_agent` | Get full details of a single agent |
-| `create_agent` | Create an agent (pass `description` for auto-generated system prompt) |
-| `update_agent` | Update name, prompt, or tools; re-scaffold with `description` |
-| `delete_agent` | **Permanently** delete an agent (irreversible) |
+| `get_agent` | Get full details of a single agent including its system prompt and tools |
+| `create_agent` | Create an agent — pass `description` for auto-generated system prompt |
+| `update_agent` | Update name, prompt, or tools; re-scaffold by passing a new `description` |
+| `delete_agent` | **Permanently** delete an agent and all its logs, memories, and threads |
+
+### Running agents
+
+| Tool | Description |
+|------|-------------|
 | `run_agent` | Start an async run; returns `execution_id` for polling |
-| `get_run_status` | Poll run status: queued → running → completed / error / cancelled / paused |
-| `get_run_logs` | Fetch full chronological event log for a completed run |
+| `get_run_status` | Poll status: `queued` → `running` → `completed` / `error` / `cancelled` |
+| `get_run_logs` | Fetch the full chronological event log for a completed run |
 | `list_executions` | List recent runs for an agent with status and duration |
-| `test_agent` | Quick sync test (15s timeout) — start a run and wait for it to finish |
-| `list_tools` | List tools available to attach to agents |
+| `test_agent` | Quick sync test — runs an agent and waits up to 15s for the result |
 
-## Typical workflow in Claude Code
+### Tools
 
-```
-list_projects
-  → list_agents project_id=1
-    → create_agent name="Support Bot" project_id=1 description="Handles customer refund requests"
-      → run_agent agent_id="..." prompt="Process refund for order #1234"
-        → get_run_status agent_id="..." execution_id="..."
-          → get_run_logs agent_id="..." execution_id="..."
-```
+| Tool | Description |
+|------|-------------|
+| `list_tools` | List built-in and custom tools available to attach to agents |
 
-Or use `test_agent` to run and wait in one step:
+## Example prompts
+
+Once installed, you can talk to your agents naturally in any supported IDE:
 
 ```
-test_agent agent_id="..." prompt="Hello, can you help me?"
+List my projects, then show me all agents in the "production" project.
 ```
+
+```
+Create an agent called "Support Bot" in project 12 that handles customer refund requests.
+```
+
+```
+Run the "Data Processor" agent with the prompt "Summarize last week's sales data".
+```
+
+```
+Check the status of execution abc-123 for agent xyz-456, then show me the logs.
+```
+
+```
+Test the "Email Classifier" agent with "Is this email spam: win a free iPhone now!"
+```
+
+## Configuration
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `SPACESHIP_API_KEY` | Yes | — | Your API key (`sk_live_...`) |
+| `SPACESHIP_API_URL` | No | `https://spaceshipai.io` | Override for local dev or staging |
 
 ## Development
 
@@ -97,3 +171,7 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 pytest tests/ -v
 ```
+
+## License
+
+MIT
