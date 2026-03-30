@@ -130,6 +130,54 @@ class SpaceshipClient:
         self._delete(f"/api/v1/agents/{agent_id}")
 
     # ------------------------------------------------------------------
+    # Orchestrations
+    # ------------------------------------------------------------------
+
+    def list_orchestrations(
+        self,
+        project_id: int | None = None,
+        limit: int = 50,
+    ) -> list[dict]:
+        """Return orchestrations, optionally filtered by project."""
+        params: dict = {"limit": limit}
+        if project_id is not None:
+            params["project_id"] = project_id
+        data = self._get("/api/v1/orchestrations", params=params)
+        return data["orchestrations"]
+
+    def get_orchestration(self, orchestration_id: str) -> dict:
+        """Return full details of a single orchestration including its members."""
+        data = self._get(f"/api/v1/orchestrations/{orchestration_id}")
+        return data["orchestration"]
+
+    def run_orchestration(
+        self,
+        orchestration_id: str,
+        input_data: dict | None = None,
+        params: dict | None = None,
+    ) -> dict:
+        """Enqueue an orchestration run. Returns ``{execution_id, status}``."""
+        payload: dict = {}
+        if input_data is not None:
+            payload["input_data"] = input_data
+        if params is not None:
+            payload["params"] = params
+        return self._post(f"/api/v1/orchestrations/{orchestration_id}/run", json=payload)
+
+    def get_orchestration_executions(
+        self,
+        orchestration_id: str,
+        execution_id: str | None = None,
+        limit: int = 10,
+    ) -> list[dict]:
+        """Return execution summaries for an orchestration."""
+        p: dict = {"limit": limit}
+        if execution_id is not None:
+            p["execution_id"] = execution_id
+        data = self._get(f"/api/v1/orchestrations/{orchestration_id}/executions", params=p)
+        return data["executions"]
+
+    # ------------------------------------------------------------------
     # Runs
     # ------------------------------------------------------------------
 

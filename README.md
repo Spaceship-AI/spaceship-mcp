@@ -128,6 +128,15 @@ Get your API key from [spaceshipai.io](https://spaceshipai.io) under **Settings 
 | `list_executions` | List recent runs for an agent with status and duration |
 | `test_agent` | Quick sync test — runs an agent and waits up to 15s for the result |
 
+### Orchestrations
+
+| Tool | Description |
+|------|-------------|
+| `list_orchestrations` | List orchestrations, optionally filtered by project |
+| `get_orchestration` | Get full details of an orchestration including its members and tools |
+| `run_orchestration` | Start an async orchestration run; returns `execution_id` |
+| `test_orchestration` | Quick sync test — runs an orchestration and waits up to 15s for the result |
+
 ### Tools
 
 | Tool | Description |
@@ -156,6 +165,14 @@ Check the status of execution abc-123 for agent xyz-456, then show me the logs.
 
 ```
 Test the "Email Classifier" agent with "Is this email spam: win a free iPhone now!"
+```
+
+```
+List my orchestrations in the "production" project, then run the "Data Pipeline" orchestration.
+```
+
+```
+Test the "Research Team" orchestration with input {"topic": "AI safety"} and show me the result.
 ```
 
 ## Configuration

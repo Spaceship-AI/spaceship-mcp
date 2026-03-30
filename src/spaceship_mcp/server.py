@@ -1,4 +1,4 @@
-"""Spaceship AI MCP server — 12 tools for full agent lifecycle management."""
+"""Spaceship AI MCP server — 16 tools for full agent and orchestration lifecycle management."""
 
 from __future__ import annotations
 
@@ -229,6 +229,57 @@ def list_executions(agent_id: str, limit: int = 10) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
+# Orchestrations
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool()
+def list_orchestrations(
+    project_id: Optional[int] = None,
+    limit: int = 50,
+) -> list[dict]:
+    """List orchestrations in the organization, optionally filtered by project.
+
+    Pass ``project_id`` (from list_projects) to scope results to a single project.
+    Each orchestration includes its members and their attached tools.
+    """
+    return _client().list_orchestrations(project_id=project_id, limit=limit)
+
+
+@mcp.tool()
+def get_orchestration(orchestration_id: str) -> dict:
+    """Get full details of a single orchestration including its members and tools.
+
+    Args:
+        orchestration_id: The orchestration's UUID (from list_orchestrations).
+    """
+    return _client().get_orchestration(orchestration_id=orchestration_id)
+
+
+@mcp.tool()
+def run_orchestration(
+    orchestration_id: str,
+    input_data: Optional[dict] = None,
+    params: Optional[dict] = None,
+) -> dict:
+    """Start an asynchronous orchestration run and return immediately.
+
+    Returns an ``execution_id`` — use ``test_orchestration`` to block until
+    completion or poll ``/executions`` for status updates.
+
+    Args:
+        orchestration_id: The orchestration's UUID.
+        input_data: Input data passed to the orchestration (e.g. ``{"query": "…"}``).
+        params: Optional extra execution parameters.
+    """
+    return _client().run_orchestration(
+        orchestration_id=orchestration_id,
+        input_data=input_data,
+        params=params,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Quick test (synchronous short-poll)
 # ---------------------------------------------------------------------------
 
@@ -272,6 +323,54 @@ async def test_agent(ctx, agent_id: str, prompt: str) -> dict:
         await asyncio.sleep(2)
 
     return {"status": "timeout", "execution_id": execution_id, "agent_id": agent_id}
+
+
+@mcp.tool()
+async def test_orchestration(
+    ctx,
+    orchestration_id: str,
+    input_data: Optional[dict] = None,
+) -> dict:
+    """Quick synchronous test of an orchestration with a 15-second timeout.
+
+    Starts a run and polls every 2 seconds until it completes (or times out).
+    Reports progress via MCP notifications while waiting. Returns the final
+    status and execution_id.
+
+    Args:
+        orchestration_id: The orchestration's UUID.
+        input_data: Optional input data for the orchestration run.
+    """
+    client = _client()
+    run = client.run_orchestration(
+        orchestration_id=orchestration_id,
+        input_data=input_data or {},
+    )
+    execution_id = run["execution_id"]
+    deadline = time.monotonic() + 15
+
+    while time.monotonic() < deadline:
+        executions = client.get_orchestration_executions(
+            orchestration_id=orchestration_id, execution_id=execution_id, limit=1
+        )
+        status = executions[0]["status"] if executions else "pending"
+
+        if status in ("completed", "failed", "cancelled"):
+            return {
+                "status": status,
+                "execution_id": execution_id,
+                "orchestration_id": orchestration_id,
+            }
+
+        remaining = int(deadline - time.monotonic())
+        await ctx.report_progress(
+            progress=0,
+            total=1,
+            message=f"Run {status}... ({remaining}s remaining)",
+        )
+        await asyncio.sleep(2)
+
+    return {"status": "timeout", "execution_id": execution_id, "orchestration_id": orchestration_id}
 
 
 # ---------------------------------------------------------------------------
