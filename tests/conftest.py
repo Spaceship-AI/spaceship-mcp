@@ -63,3 +63,27 @@ SAMPLE_LOG = {
     "duration_ms": None,
     "created_at": "2026-03-26T10:00:00Z",
 }
+
+SAMPLE_ORCHESTRATION = {
+    "id": 1,
+    "uuid": "orch-uuid-1",
+    "name": "Test Orchestration",
+    "framework": "crewai",
+    "status": "active",
+    "project_id": 1,
+    "orchestration_members": [],
+}
+
+SAMPLE_ORCH_RUN = {
+    "execution_id": "orch-exec-uuid-1",
+    "status": "queued",
+}
+
+SAMPLE_ORCH_EXECUTION = {
+    "execution_id": "orch-exec-uuid-1",
+    "status": "completed",
+    "duration_ms": 3000,
+    "error_message": None,
+    "created_at": "2026-03-26T10:00:00Z",
+    "updated_at": "2026-03-26T10:00:05Z",
+}
