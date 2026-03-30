@@ -1,4 +1,4 @@
-name: Publish to PyPI
+name: CI
 
 on:
   pull_request:  # run tests on every PR commit
