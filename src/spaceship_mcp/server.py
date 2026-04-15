@@ -47,13 +47,13 @@ def list_projects(limit: int = 50) -> list[dict]:
 
 @mcp.tool()
 def list_agents(
-    project_id: Optional[int] = None,
+    project_id: Optional[str] = None,
     limit: int = 50,
 ) -> list[dict]:
     """List agents in the organization, optionally filtered by project.
 
-    Pass ``project_id`` (from list_projects) to scope the results to a single
-    project. Each agent record includes its tools and configuration.
+    Pass ``project_id`` (UUID from list_projects) to scope the results to a
+    single project. Each agent record includes its tools and configuration.
     """
     return _client().list_agents(project_id=project_id, limit=limit)
 
@@ -71,7 +71,7 @@ def get_agent(agent_id: str) -> dict:
 @mcp.tool()
 def create_agent(
     name: str,
-    project_id: int,
+    project_id: str,
     description: Optional[str] = None,
     prompt: Optional[str] = None,
     framework: str = "langchain",
@@ -85,7 +85,7 @@ def create_agent(
 
     Args:
         name: Display name for the agent.
-        project_id: ID of the project this agent belongs to (from list_projects).
+        project_id: UUID of the project this agent belongs to (from list_projects).
         description: Natural-language description — triggers server-side prompt scaffolding.
         prompt: Raw system prompt to use as-is (skips scaffolding).
         framework: Execution framework. Defaults to ``langchain``.
@@ -235,13 +235,13 @@ def list_executions(agent_id: str, limit: int = 10) -> list[dict]:
 
 @mcp.tool()
 def list_orchestrations(
-    project_id: Optional[int] = None,
+    project_id: Optional[str] = None,
     limit: int = 50,
 ) -> list[dict]:
     """List orchestrations in the organization, optionally filtered by project.
 
-    Pass ``project_id`` (from list_projects) to scope results to a single project.
-    Each orchestration includes its members and their attached tools.
+    Pass ``project_id`` (UUID from list_projects) to scope results to a single
+    project. Each orchestration includes its members and their attached tools.
     """
     return _client().list_orchestrations(project_id=project_id, limit=limit)
 

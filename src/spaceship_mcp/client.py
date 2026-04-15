@@ -81,7 +81,7 @@ class SpaceshipClient:
 
     def list_agents(
         self,
-        project_id: int | None = None,
+        project_id: str | None = None,
         limit: int = 50,
     ) -> list[dict]:
         """Return agents, optionally filtered by project."""
@@ -99,7 +99,7 @@ class SpaceshipClient:
     def create_agent(
         self,
         name: str,
-        project_id: int,
+        project_id: str,
         framework: str = "langchain",
         description: str | None = None,
         prompt: str | None = None,
@@ -135,7 +135,7 @@ class SpaceshipClient:
 
     def list_orchestrations(
         self,
-        project_id: int | None = None,
+        project_id: str | None = None,
         limit: int = 50,
     ) -> list[dict]:
         """Return orchestrations, optionally filtered by project."""
