@@ -185,6 +185,8 @@ def get_run_status(agent_id: str, execution_id: str) -> dict:
     Status values: ``queued`` → ``running`` → ``completed`` | ``error`` |
     ``cancelled`` | ``paused`` (waiting for approval).
 
+    Poll every 3-5 seconds. Most agents complete within 30-60 seconds.
+
     Args:
         agent_id: The agent's UUID.
         execution_id: The execution UUID returned by ``run_agent``.
@@ -286,11 +288,13 @@ def run_orchestration(
 
 @mcp.tool()
 async def test_agent(ctx, agent_id: str, prompt: str) -> dict:
-    """Quick synchronous test of an agent with a 15-second timeout.
+    """Quick synchronous test of an agent with a 90-second timeout.
 
     Starts a run and polls every 2 seconds until it completes (or times out).
     Reports progress via MCP notifications while waiting. Returns the final
     status and execution_id. Use ``get_run_logs`` afterwards to see the output.
+
+    For production usage, prefer ``run_agent`` + ``get_run_status`` (non-blocking).
 
     Args:
         agent_id: The agent's UUID.
@@ -299,7 +303,7 @@ async def test_agent(ctx, agent_id: str, prompt: str) -> dict:
     client = _client()
     run = client.run_agent(agent_id=agent_id, prompt=prompt)
     execution_id = run["execution_id"]
-    deadline = time.monotonic() + 15
+    deadline = time.monotonic() + 90
 
     while time.monotonic() < deadline:
         executions = client.get_executions(
@@ -331,7 +335,7 @@ async def test_orchestration(
     orchestration_id: str,
     input_data: Optional[dict] = None,
 ) -> dict:
-    """Quick synchronous test of an orchestration with a 15-second timeout.
+    """Quick synchronous test of an orchestration with a 90-second timeout.
 
     Starts a run and polls every 2 seconds until it completes (or times out).
     Reports progress via MCP notifications while waiting. Returns the final
@@ -347,7 +351,7 @@ async def test_orchestration(
         input_data=input_data or {},
     )
     execution_id = run["execution_id"]
-    deadline = time.monotonic() + 15
+    deadline = time.monotonic() + 90
 
     while time.monotonic() < deadline:
         executions = client.get_orchestration_executions(
