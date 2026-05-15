@@ -43,6 +43,7 @@ def test_list_projects_raises_on_401(client: SpaceshipClient) -> None:
             client.list_projects()
 
     assert exc_info.value.status_code == 401
+    assert "npx spaceshipai@latest init" in str(exc_info.value)
 
 
 def test_list_projects_sends_api_key_header(client: SpaceshipClient) -> None:
