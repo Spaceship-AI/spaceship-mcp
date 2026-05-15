@@ -57,6 +57,12 @@ class SpaceshipClient:
     def _raise_for_status(resp: httpx.Response) -> None:
         if resp.is_success:
             return
+        if resp.status_code == 401:
+            raise SpaceshipError(
+                "Your Spaceship API key is invalid or has been revoked. "
+                "Run `npx spaceshipai@latest init` to re-authenticate.",
+                status_code=401,
+            )
         try:
             detail = resp.json().get("error", resp.text)
         except Exception:
